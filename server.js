@@ -30,8 +30,9 @@ wss.on("connection", (ws) => {
     // Register user to connection map
     if (data.type === "register") {
       clients.set(data.userId, ws);
-      console.log("User registered: " + data.userId);
-      if (client.readyState === WebSocket.OPEN) {
+      console.log("New User registered: " + data.userId);
+      clients.forEach((client, uid) => {
+         if (client.readyState === WebSocket.OPEN) {
           client.send(
             JSON.stringify({
               type: "User Register Success",
@@ -39,6 +40,7 @@ wss.on("connection", (ws) => {
             })
           );
         }
+      });
       return;
     }
 
