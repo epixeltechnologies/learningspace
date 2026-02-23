@@ -1,16 +1,16 @@
 import WebSocket, { WebSocketServer } from "ws";
-import pkg from "pg";
-import dotenv from "dotenv";
+// import pkg from "pg";
+// import dotenv from "dotenv";
 
-dotenv.config();
+// dotenv.config();
 
-const { Pool } = pkg;
+// const { Pool } = pkg;
 
-// Postgres DB
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+// // Postgres DB
+// const db = new Pool({
+//   connectionString: process.env.DATABASE_URL,
+//   ssl: { rejectUnauthorized: false }
+// });
 
 // WebSocket Server
 const PORT = process.env.PORT || 10000;
@@ -31,6 +31,12 @@ wss.on("connection", (ws) => {
     if (data.type === "register") {
       clients.set(data.userId, ws);
       console.log("User registered: " + data.userId);
+      client.send(
+            JSON.stringify({
+              type: "User Register Success",
+              time: new Date().toISOString(),
+            })
+          );
       return;
     }
 
@@ -39,10 +45,10 @@ wss.on("connection", (ws) => {
       const { chatId, senderId, text } = data;
 
       // Save to DB
-      await db.query(
-        "INSERT INTO messages (chat_id, sender_id, text) VALUES ($1, $2, $3)",
-        [chatId, senderId, text]
-      );
+    //   await db.query(
+    //     "INSERT INTO messages (chat_id, sender_id, text) VALUES ($1, $2, $3)",
+    //     [chatId, senderId, text]
+    //   );
 
       // Broadcast to all users in chat
       clients.forEach((client, uid) => {
@@ -64,15 +70,15 @@ wss.on("connection", (ws) => {
     if (data.type === "history") {
       const { chatId } = data;
 
-      const result = await db.query(
-        "SELECT * FROM messages WHERE chat_id = $1 ORDER BY id ASC",
-        [chatId]
-      );
+    //   const result = await db.query(
+    //     "SELECT * FROM messages WHERE chat_id = $1 ORDER BY id ASC",
+    //     [chatId]
+    //   );
 
       ws.send(
         JSON.stringify({
           type: "history",
-          messages: result.rows,
+        //   messages: result.rows,
         })
       );
     }
