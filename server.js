@@ -82,7 +82,7 @@ wss.on("connection", (ws) => {
       ws.send(
         JSON.stringify({
           type: "history",
-          data:chats[chatId]
+          data:!chats.has(chatId)?chats[chatId]:[]
           //   messages: result.rows,
         }),
       );
