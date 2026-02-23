@@ -44,12 +44,16 @@ wss.on("connection", (ws) => {
     // Send message
     if (data.type === "message") {
       const { chatId, senderId, text } = data;
-      chats[chatId].add({
-      time: new Date().toISOString(),
-      "chatId": chatId,
-      "senderId": senderId,
-      "text": text,
-      });
+      // If chatId does not exist yet, initialize it
+  if (!chats.has(chatId)) {
+    chats.set(chatId, []); // value is an array
+  } // Push message into the array
+  chats.get(chatId).push({
+    senderId,
+    text,
+    time: new Date().toISOString(),
+  });
+      
       // Save to DB
       //   await db.query(
       //     "INSERT INTO messages (chat_id, sender_id, text) VALUES ($1, $2, $3)",
