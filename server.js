@@ -29,7 +29,8 @@ wss.on("connection", (ws) => {
 
     // Register user to connection map
     if (data.type === "register") {
-      clients.set(data.userId, ws);
+      try{
+        clients.set(data.userId, ws);
       console.log("New User registered: " + data.userId);
       
       // Send confirmation to all registered users
@@ -44,6 +45,9 @@ wss.on("connection", (ws) => {
           );
         }
       });
+      }catch(e){
+        console.log("New User Fail:::: " + e.toString());
+      }
 
       return;
     }
