@@ -31,12 +31,14 @@ wss.on("connection", (ws) => {
     if (data.type === "register") {
       clients.set(data.userId, ws);
       console.log("User registered: " + data.userId);
-      client.send(
+      if (client.readyState === WebSocket.OPEN) {
+          client.send(
             JSON.stringify({
               type: "User Register Success",
               time: new Date().toISOString(),
             })
           );
+        }
       return;
     }
 
