@@ -1,16 +1,4 @@
 import WebSocket, { WebSocketServer } from "ws";
-// import pkg from "pg";
-// import dotenv from "dotenv";
-
-// dotenv.config();
-
-// const { Pool } = pkg;
-
-// // Postgres DB
-// const db = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: { rejectUnauthorized: false }
-// });
 
 // WebSocket Server
 const PORT = process.env.PORT || 10000;
@@ -18,6 +6,7 @@ const wss = new WebSocketServer({ port: PORT }, () =>
   console.log("WebSocket running on " + PORT),
 );
 
+const chats = new Map();
 // Store connected users
 const clients = new Map();
 
@@ -51,26 +40,16 @@ wss.on("connection", (ws) => {
 
       return;
     }
-    // if (data.type === "register") {
-    //   clients.set(data.userId, ws);
-    //   console.log("NewUser registered: " + data.userId);
-    //   clients.forEach((client, uid) => {
-    //      if (client.readyState === WebSocket.OPEN) {
-    //       client.send(
-    //         JSON.stringify({
-    //           type: "User Register Success",
-    //           time: new Date().toISOString(),
-    //         })
-    //       );
-    //     }
-    //   });
-    //   return;
-    // }
 
     // Send message
     if (data.type === "message") {
       const { chatId, senderId, text } = data;
-
+      chats[chatId].add({
+      time: new Date().toISOString(),
+      "chatId": chatId,
+      "senderId": senderId,
+      "text": text,
+      });
       // Save to DB
       //   await db.query(
       //     "INSERT INTO messages (chat_id, sender_id, text) VALUES ($1, $2, $3)",
@@ -96,15 +75,10 @@ wss.on("connection", (ws) => {
     // Load history
     if (data.type === "history") {
       const { chatId } = data;
-
-      //   const result = await db.query(
-      //     "SELECT * FROM messages WHERE chat_id = $1 ORDER BY id ASC",
-      //     [chatId]
-      //   );
-
       ws.send(
         JSON.stringify({
           type: "history",
+          data:chats[chatId]
           //   messages: result.rows,
         }),
       );
