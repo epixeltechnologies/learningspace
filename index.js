@@ -19,7 +19,11 @@ app.get("/token", (req, res) => {
   }
 
   const channelName = req.query.channel;
-  const uid = req.query.uid || 0;
+  // const uid = req.query.uid || 0;
+  const uid = parseInt(req.query.uid, 10);
+if (isNaN(uid)) {
+  return res.status(400).json({ error: "UID must be a number" });
+}
   const expireTime = 3600;
 
   if (!channelName) {
