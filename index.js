@@ -1,11 +1,21 @@
-import { RtcTokenBuilder, RtcRole } from "agora-access-token";
+import pkg from "agora-access-token";
+const { RtcTokenBuilder, RtcRole } = pkg;
+import express from "express";
+import cors from "cors";
 
-export default function handler(req, res) {
-  const APP_ID = process.env.APP_ID;
-  const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
+const app = express();
+app.use(cors());
 
+const APP_ID = process.env.APP_ID;
+const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
+
+app.get("/", (req, res) => {
+  res.send("Agora Token Server Running");
+});
+
+app.get("/token", (req, res) => {
   if (!APP_ID || !APP_CERTIFICATE) {
-    return res.status(500).json({ error: "APP_ID or APP_CERTIFICATE missing" });
+    return res.status(500).json({ error: "Missing APP_ID or APP_CERTIFICATE" });
   }
 
   const channelName = req.query.channel;
@@ -28,5 +38,9 @@ export default function handler(req, res) {
     expire
   );
 
-  return res.status(200).json({ token });
-}
+  res.json({ token });
+});
+
+app.listen(10000, () => {
+  console.log("Server running on port 10000");
+});
